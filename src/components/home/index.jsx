@@ -67,51 +67,54 @@ const Index = () => {
   const allArticles = data?.pages.flatMap((page) => page.articles) || [];
 
   return (
-    <div className="space-y-8 pb-20">
-      <Intro />
-      <div className="space-y-12">
-        <Navbar />
+    <div className="min-h-screen bg-[#F8F9FA]">
+      <Navbar />
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-10">
+        <Intro />
         
-        {isLoading ? (
-          <LoadingComponent />
-        ) : isError ? (
-          <ErrorComponent />
-        ) : allArticles.length > 0 ? (
-          <div className="space-y-12">
-            <Grid data={allArticles} />
-            
-            {hasNextPage && (
-              <div className="flex justify-center pt-8">
-                <button
-                  onClick={() => fetchNextPage()}
-                  disabled={isFetchingNextPage}
-                  className="px-8 py-3 bg-white border-2 border-slate-900 text-slate-900 font-bold rounded-full hover:bg-slate-900 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl active:scale-95"
-                >
-                  {isFetchingNextPage ? (
-                    <span className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                      Loading More...
-                    </span>
-                  ) : (
-                    "Load More Articles"
-                  )}
-                </button>
-              </div>
-            )}
-            
-            {!hasNextPage && allArticles.length > 0 && (
-              <p className="text-center text-slate-400 text-sm font-medium italic tracking-tight">
-                You've reached the end of the news feed.
-              </p>
-            )}
-          </div>
-        ) : (
-          <div className="w-full h-[40vh] flex flex-col items-center justify-center space-y-4">
-             <h2 className="text-slate-400 font-bold text-xl uppercase tracking-tighter">No articles found</h2>
-             <p className="text-slate-500 text-sm">Try exploring a different category or search term.</p>
-          </div>
-        )}
-      </div>
+        <div className="space-y-12">
+          {isLoading ? (
+            <LoadingComponent />
+          ) : isError ? (
+            <ErrorComponent />
+          ) : allArticles.length > 0 ? (
+            <div className="space-y-12">
+              <Grid data={allArticles} />
+              
+              {hasNextPage && (
+                <div className="flex justify-center pt-8">
+                  <button
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                    className="px-8 py-3 bg-white border-2 border-slate-900 text-slate-900 font-bold rounded-full hover:bg-slate-900 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl active:scale-95"
+                  >
+                    {isFetchingNextPage ? (
+                      <span className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                        Loading More...
+                      </span>
+                    ) : (
+                      "Load More Articles"
+                    )}
+                  </button>
+                </div>
+              )}
+              
+              {!hasNextPage && allArticles.length > 0 && (
+                <p className="text-center text-slate-400 text-sm font-medium italic tracking-tight">
+                  You've reached the end of the news feed.
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="w-full h-[40vh] flex flex-col items-center justify-center space-y-4">
+               <h2 className="text-slate-400 font-bold text-xl uppercase tracking-tighter">No articles found</h2>
+               <p className="text-slate-500 text-sm">Try exploring a different category or search term.</p>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 };

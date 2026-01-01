@@ -18,65 +18,77 @@ const Navbar = () => {
     setCurrent(index);
     setNewsUrl(url);
     setNewsKey(name);
-    setSearchTerm(""); // Reset search on category change
+    setSearchTerm("");
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
 
-    // Use everything?q=... for general searches
     const searchUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(
       searchTerm
     )}&sortBy=relevancy&apiKey=${process.env.NEXT_PUBLIC_NEWS_API_KEY}`;
 
     setNewsUrl(searchUrl);
     setNewsKey(`search-${searchTerm}`);
-    setCurrent(-1); // Deselect categories
+    setCurrent(-1);
   };
 
   return (
-    <nav className="flex flex-col gap-6 lg:flex-row lg:justify-between lg:items-center py-4 border-b border-slate-200">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-8 grow">
-        <h2 className="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-widest">
-          Categories
-        </h2>
-        <menu className="flex flex-wrap items-center justify-start gap-2">
-          {navLinkData.map((el, i) => (
-            <button
-              key={v4()}
-              onClick={() => handleFetchByCategory(el.url, el.name, i)}
-              className={`inline-block py-2 px-4 rounded-full border transition-all duration-300 ${
-                current === i
-                  ? "bg-slate-900 text-white border-slate-900 shadow-lg scale-105"
-                  : "text-slate-600 bg-white border-slate-200 hover:border-slate-800 hover:text-slate-900"
-              } font-bold text-[10px] uppercase tracking-wider`}
-            >
-              {el.name}
-            </button>
-          ))}
-        </menu>
-      </div>
+    <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 sm:px-8 py-3 transition-all duration-300">
+      <div className="max-w-7xl mx-auto flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        {/* Left Side: Brand and Categories */}
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-8 grow">
+          <div className="flex items-center justify-between">
+             <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase italic">
+               RT<span className="text-slate-500">News</span>
+             </h1>
+             {/* Mobile Auth/Account Actions */}
+             <div className="flex lg:hidden items-center gap-3">
+               {isAllowed ? <LogOutBtn /> : <SignInDialog />}
+               {isAllowed && <AccountBtn />}
+             </div>
+          </div>
 
-      <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
-        <form
-          onSubmit={handleSearch}
-          className="relative w-full sm:w-72 group"
-        >
-          <input
-            type="text"
-            placeholder="Search global news..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm"
-          />
-          <IoSearchOutline className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 text-lg transition-colors" />
-          <button type="submit" className="hidden">Search</button>
-        </form>
+          <menu className="flex items-center justify-start gap-1 overflow-x-auto no-scrollbar pb-1 lg:pb-0">
+            {navLinkData.map((el, i) => (
+              <button
+                key={v4()}
+                onClick={() => handleFetchByCategory(el.url, el.name, i)}
+                className={`flex-shrink-0 py-2 px-4 rounded-full transition-all duration-300 font-bold text-[10px] uppercase tracking-wider ${
+                  current === i
+                    ? "bg-slate-900 text-white shadow-md scale-105"
+                    : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                }`}
+              >
+                {el.name}
+              </button>
+            ))}
+          </menu>
+        </div>
 
-        <div className="flex items-center gap-4">
-          {isAllowed ? <LogOutBtn /> : <SignInDialog />}
-          {isAllowed && <AccountBtn />}
+        {/* Right Side: Search and Desktop Auth */}
+        <div className="flex items-center gap-4 w-full lg:w-auto">
+          <form
+            onSubmit={handleSearch}
+            className="relative flex-1 lg:w-64 group"
+          >
+            <input
+              type="text"
+              placeholder="Search news..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-100/50 border border-transparent rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white focus:border-slate-200 transition-all duration-300"
+            />
+            <IoSearchOutline className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 text-base" />
+            <button type="submit" className="hidden">Search</button>
+          </form>
+
+          {/* Desktop Auth/Account Actions */}
+          <div className="hidden lg:flex items-center gap-3">
+            {isAllowed ? <LogOutBtn /> : <SignInDialog />}
+            {isAllowed && <AccountBtn />}
+          </div>
         </div>
       </div>
     </nav>
