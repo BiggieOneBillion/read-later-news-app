@@ -6,17 +6,17 @@ import { useGlobalContext } from "@/context/global-context";
 import { toast, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const SaveBtn = (data) => {
+const SaveBtn = ({ data }) => {
   const { auth } = useGlobalContext();
 
   const info = {
-    author: data.data.author,
-    content: data.data.content,
-    description: data.data.description,
-    publishedAt: data.data.publishedAt,
-    title: data.data.title,
-    urlToImage: data.data.urlToImage,
-    url: data.data.url,
+    author: data.author,
+    content: data.content,
+    description: data.description,
+    publishedAt: data.publishedAt,
+    title: data.title,
+    urlToImage: data.urlToImage,
+    url: data.url,
     userId: auth,
   };
 
@@ -26,12 +26,15 @@ const SaveBtn = (data) => {
     },
   });
 
-  const handleSave = () => {
-    // first check if the user is signed in
+  const handleSave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (auth) {
       mutations.mutate();
       return;
     }
+    
     return toast.error("Sign In To Save News", {
       position: "top-center",
       autoClose: 5000,
@@ -45,28 +48,42 @@ const SaveBtn = (data) => {
     });
   };
 
+  const getButtonStatus = () => {
+    if (mutations.isPending) return "animate-pulse bg-white/40";
+    if (mutations.isSuccess) return "bg-green-500/80 text-white border-green-400";
+    if (mutations.isError) return "bg-red-500/80 text-white border-red-400";
+    return "bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/30";
+  };
+
+  const getIconColor = () => {
+    if (mutations.isSuccess) return "text-white";
+    if (mutations.isError) return "text-white";
+    return "text-white group-hover:text-white";
+  };
+
   return (
     <button
-      disabled={mutations.isPending}
+      disabled={mutations.isPending || mutations.isSuccess}
       onClick={handleSave}
-      className="flex disabled:cursor-none justify-start items-center gap-1 text-sm py-1 px-2 border rounded-sm active:scale-95 hover:border-slate-400 transition-all duration-300  "
+      aria-label="Save News"
+      className={`
+        flex items-center justify-center 
+        w-10 h-10 rounded-full 
+        border shadow-lg 
+        active:scale-90 
+        transition-all duration-300 
+        group
+        ${getButtonStatus()}
+      `}
     >
-      <span className="text-xl">
+      <span className={`text-2xl transition-all duration-300 ${getIconColor()}`}>
         <CiBookmark />
       </span>
-      {mutations.isPending ? (
-        <span className="font-semibold">saving...</span>
-      ) : mutations.isSuccess ? (
-        <span className="font-semibold">saved</span>
-      ) : mutations.isError ? (
-        <span className="font-semibold">
-          {mutations.error.message === "Request failed with status code 420"
-            ? "Saved Already"
-            : "Try Again"}
-        </span>
-      ) : (
-        <span className="font-semibold">save</span>
-      )}
+      
+      {/* Tooltip or status message for accessibility/clarity */}
+      <span className="sr-only">
+        {mutations.isPending ? "Saving..." : mutations.isSuccess ? "Saved" : "Save"}
+      </span>
     </button>
   );
 };
