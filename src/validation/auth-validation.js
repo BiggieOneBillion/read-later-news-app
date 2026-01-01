@@ -14,8 +14,8 @@ export const SignUpSchema = z.object({
     .min(6, { message: "Password can not be less than 6 characters" }),
   firstname: z
     .string()
-    .min(6, { message: "First name can not be less than 5 characters" }),
+    .min(1, { message: "First name can not be empty" }),
   lastname: z
     .string()
-    .min(6, { message: "Last name can not be less than 5 characters" }),
+    .min(1, { message: "Last name can not be empty" }),
 });

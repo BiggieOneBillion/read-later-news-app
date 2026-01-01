@@ -5,9 +5,12 @@ import axios from "axios";
 import { useGlobalContext } from "@/context/global-context";
 import { toast, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useUserStore } from "@/store/user-store";
 
 const SaveBtn = ({ data }) => {
   const { auth } = useGlobalContext();
+
+  const id = useUserStore((state) => state.userDetails);
 
   const info = {
     author: data.author,
@@ -17,7 +20,7 @@ const SaveBtn = ({ data }) => {
     title: data.title,
     urlToImage: data.urlToImage,
     url: data.url,
-    userId: auth,
+    userId: id,
   };
 
   const mutations = useMutation({
@@ -30,7 +33,7 @@ const SaveBtn = ({ data }) => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (auth) {
+    if (id) {
       mutations.mutate();
       return;
     }

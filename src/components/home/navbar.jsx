@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import SignInDialog from "./auth";
 import { v4 } from "uuid";
 import { useGlobalContext } from "@/context/global-context";
-import LogOutBtn from "./logout-btn";
-import AccountBtn from "./account-btn";
+import UserMenu from "./user-menu";
 import { useUserStore } from "@/store/user-store";
 import { navLinkData } from "@/data/data";
 import { IoSearchOutline } from "react-icons/io5";
@@ -45,8 +44,7 @@ const Navbar = () => {
              </h1>
              {/* Mobile Auth/Account Actions */}
              <div className="flex lg:hidden items-center gap-3">
-               {isAllowed ? <LogOutBtn /> : <SignInDialog />}
-               {isAllowed && <AccountBtn />}
+               {isAllowed ? <UserMenu /> : <SignInDialog />}
              </div>
           </div>
 
@@ -86,8 +84,7 @@ const Navbar = () => {
 
           {/* Desktop Auth/Account Actions */}
           <div className="hidden lg:flex items-center gap-3">
-            {isAllowed ? <LogOutBtn /> : <SignInDialog />}
-            {isAllowed && <AccountBtn />}
+            {isAllowed ? <UserMenu /> : <SignInDialog />}
           </div>
         </div>
       </div>

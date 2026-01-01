@@ -1,11 +1,12 @@
 import { dbConnect } from "@/libs/db";
 import Users from "@/model/user-registration";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export async function POST(req, res) {
+  console.log("HIT REQUEEST")
   const data = await req.json();
-  // console.log(data);
+  console.log(data);
   // console.log(registrationSchema.safeParse(data));
   // return NextResponse.json({data})
   try {

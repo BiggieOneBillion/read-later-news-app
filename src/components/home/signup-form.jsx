@@ -5,6 +5,7 @@ import { SignUpSchema } from "../../validation/auth-validation";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useGlobalContext } from "@/context/global-context";
+import { LuMail, LuLock, LuUser, LuLoader, LuArrowLeft } from "react-icons/lu";
 
 const SignUpForm = ({ gotoSignIn, close }) => {
   const {
@@ -17,88 +18,119 @@ const SignUpForm = ({ gotoSignIn, close }) => {
 
   const { setAuth } = useGlobalContext();
 
-  const InputContainer = ({ label, register, name, type = "text" }) => (
-    <div className="flex flex-col gap-2 text-black">
-      <label className="capitalize text-[13px] font-medium text-gray-600">
-        {label}:
-      </label>
-      <input
-        type={type}
-        className="px-4 w-full py-2 text-base border rounded-md text-black bg-[#F3F2EE]"
-        {...register(name)}
-      />
-      <span className="h-4 text-red-600 text-sm">
-        {errors[name] && errors[name].message}
-      </span>
-    </div>
-  );
-
   const mutations = useMutation({
-    mutationFn: (info) => {
-      return axios.post("/api/user", info);
-    },
+    mutationFn: (info) => axios.post("/api/user", info),
     onSuccess: (data) => {
       setAuth(data.data._id);
-      setTimeout(() => {
-        close();
-      }, 500);
+      setTimeout(() => close(), 500);
     },
   });
 
-  const onSubmit = (values) => {
-    console.log(values);
-    mutations.mutate(values);
-  };
+  const onSubmit = (values) => mutations.mutate(values);
 
   return (
-    <div className="w-[300px] lg:min-w-[500px] h-fit overflow-y-scroll px-2 sm:px-10 rounded-md bg-[#F3F2EE] text space-y-5">
-      <h1 className="text-2xl font-semibold text-black text-center">Sign Up</h1>
-      <p className="flex-col items-start sm:flex-row flex sm:items-center justify-start gap-1 text-sm text-slate-500">
-        <span>Do you have an account already?</span>
-        <button
+    <div className="w-full max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="flex items-center gap-4">
+        <button 
           onClick={gotoSignIn}
-          className="underline underline-offset-1 hover:underline-offset-2"
+          className="p-3 bg-slate-50 border border-slate-100 rounded-full hover:bg-white hover:shadow-md transition-all active:scale-90"
         >
-          Sign In
+          <LuArrowLeft className="w-4 h-4 text-slate-900" />
         </button>
-      </p>
-      <form className="space-y-2">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Create Account</h1>
+          <p className="text-xs font-medium text-slate-500">Join the RTNews community today</p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest ml-1 text-nowrap">First Name</label>
+            <div className="relative group">
+              <LuUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" />
+              <input
+                type="text"
+                placeholder="John"
+                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:bg-white focus:border-slate-900 transition-all"
+                {...register("firstname")}
+              />
+            </div>
+            {errors.firstname && <p className="text-[10px] font-bold text-red-500 ml-1 leading-tight">{errors.firstname.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest ml-1 text-nowrap">Last Name</label>
+            <div className="relative group">
+              <LuUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" />
+              <input
+                type="text"
+                placeholder="Doe"
+                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:bg-white focus:border-slate-900 transition-all"
+                {...register("lastname")}
+              />
+            </div>
+            {errors.lastname && <p className="text-[10px] font-bold text-red-500 ml-1 leading-tight">{errors.lastname.message}</p>}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest ml-1">Email Address</label>
+          <div className="relative group">
+            <LuMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" />
+            <input
+              type="email"
+              placeholder="name@example.com"
+              className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:bg-white focus:border-slate-900 transition-all"
+              {...register("email")}
+            />
+          </div>
+          {errors.email && <p className="text-[10px] font-bold text-red-500 ml-1 leading-tight">{errors.email.message}</p>}
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest ml-1">Password</label>
+          <div className="relative group">
+            <LuLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" />
+            <input
+              type="password"
+              placeholder="••••••••"
+              className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:bg-white focus:border-slate-900 transition-all"
+              {...register("password")}
+            />
+          </div>
+          {errors.password && <p className="text-[10px] font-bold text-red-500 ml-1 leading-tight">{errors.password.message}</p>}
+        </div>
+
         {mutations.isError && (
-          <span className="font-medium text-sm rounded-md inline-block py-2 px-2 bg-red-400 text-red-800 w-full">
-            {mutations.error.message}
-          </span>
+          <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
+            <p className="text-[11px] font-bold text-red-600 text-center">{mutations.error.message}</p>
+          </div>
         )}
-        {mutations.isSuccess && (
-          <span className="font-medium text-sm rounded-md inline-block py-2 px-2 bg-green-400 text-green-800 w-full">
-            Successfully Logged In
-          </span>
-        )}
-        <InputContainer
-          label={"First Name"}
-          name={"firstname"}
-          register={register}
-        />
-        <InputContainer
-          label={"Last Name"}
-          name={"lastname"}
-          register={register}
-        />
-        <InputContainer label={"Email"} name={"email"} register={register} />
-        <InputContainer
-          label={"Password"}
-          name={"password"}
-          register={register}
-          type="password"
-        />
-      </form>
-      <div className="flex items-center w-full justify-start gap-5">
+
         <button
+          type="submit"
           disabled={mutations.isPending}
-          onClick={handleSubmit(onSubmit)}
-          className="w-fit px-10 bg-green-700  py-2 text-base font-medium rounded-md text-white disabled:cursor-none disabled:bg-[#02EDAF] "
+          className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-slate-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg shadow-slate-900/10"
         >
-          {mutations.isPending ? "...Loading" : "Sign In"}
+          {mutations.isPending ? (
+            <LuLoader className="w-5 h-5 animate-spin" />
+          ) : (
+            "Create Account"
+          )}
         </button>
+      </form>
+
+      <div className="pt-4 border-t border-slate-50 text-center">
+        <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+          Already have an account?{" "}
+          <button
+            onClick={gotoSignIn}
+            className="text-slate-900 font-black hover:underline underline-offset-4 decoration-2 transition-all ml-1"
+          >
+            Sign In
+          </button>
+        </p>
       </div>
     </div>
   );

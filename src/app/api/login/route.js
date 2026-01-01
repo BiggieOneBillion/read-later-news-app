@@ -1,7 +1,7 @@
 import { dbConnect } from "@/libs/db";
 import Users from "@/model/user-registration";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export async function POST(req, res) {
   const data = await req.json();
@@ -25,6 +25,8 @@ export async function POST(req, res) {
           return NextResponse.json({
             message: "Successful!!",
             userId: response._id,
+            firstname: response.firstname,
+            lastname: response.lastname,
           });
         }
         return NextResponse.json(

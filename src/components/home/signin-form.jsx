@@ -5,10 +5,12 @@ import { SignInSchema } from "../../validation/auth-validation";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { useUserStore } from "@/store/user-store";
+import { LuMail, LuLock, LuLoader } from "react-icons/lu";
 
 const SignInForm = ({ gotoSignUp, close }) => {
   const setIsAllowedTrue = useUserStore((state) => state.setIsAllowedTrue);
   const setDetails = useUserStore((state) => state.setDetails);
+  const setUserInfo = useUserStore((state) => state.setUserInfo);
 
   const {
     handleSubmit,
@@ -18,86 +20,102 @@ const SignInForm = ({ gotoSignUp, close }) => {
     resolver: zodResolver(SignInSchema),
   });
 
-  const InputContainer = ({ label, register, name, type = "text" }) => (
-    <div className="flex flex-col gap-2 text-black">
-      <label className="capitalize text-[13px] font-medium text-gray-600">
-        {label}:
-      </label>
-      <input
-        type={type}
-        className="px-4 w-full py-2 text-base border rounded-md text-black bg-[#F3F2EE]"
-        {...register(name)}
-      />
-      <span className="h-4 text-red-600 text-sm">
-        {errors[name] && errors[name].message}
-      </span>
-    </div>
-  );
-
   const mutations = useMutation({
-    mutationFn: (info) => {
-      return axios.post("/api/login", info);
-    },
+    mutationFn: (info) => axios.post("/api/login", info),
     onSuccess: (data) => {
       setIsAllowedTrue();
       setDetails(data.data.userId);
-      setTimeout(() => {
-        close();
-      }, 800);
+      setUserInfo({firstname: data.data.firstname, lastname: data.data.lastname})
+      setTimeout(() => close(), 800);
     },
   });
 
-  const onSubmit = async (values) => {
-    // console.log(values);
-    //  const response = await axios.post('https://flutternewsdb.onrender.com/api/v1/user/login', values)
-    //  if (response.status === 200) {
-    //     // console.log(response.data.userId)
-    //     setAuth(response.data.userId)
-    //  }
-    mutations.mutate(values);
-  };
-  return (
-    <div className="w-[300px] md:min-w-[500px] px-2 md:px-10 rounded-md bg-[#F3F2EE] text space-y-5">
-      <h1 className="text-2xl font-semibold text-black text-center">Sign In</h1>
-      <p className="flex items-center justify-start gap-1 text-sm text-slate-500">
-        <span>Don&apos;t have an account?</span>
-        <button
-          onClick={gotoSignUp}
-          className="underline underline-offset-1 hover:underline-offset-2"
-        >
-          Sign Up
-        </button>
-      </p>
+  const onSubmit = (values) => mutations.mutate(values);
 
-      <form className="space-y-2">
+  return (
+    <div className="w-full max-w-md mx-auto space-y-8 animate-in fade-in zoom-in duration-300">
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Welcome Back</h1>
+        <p className="text-sm font-medium text-slate-500">
+          Enter your details to access your saved news
+        </p>
+      </div>
+
+      <form 
+      // onSubmit={handleSubmit(onSubmit)} 
+      className="space-y-6">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest ml-1">Email Address</label>
+            <div className="relative group">
+              <LuMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" />
+              <input
+                type="email"
+                placeholder="name@example.com"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:bg-white focus:border-slate-900 transition-all"
+                {...register("email")}
+              />
+            </div>
+            {errors.email && <p className="text-[11px] font-bold text-red-500 ml-1">{errors.email.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest ml-1">Password</label>
+            <div className="relative group">
+              <LuLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" />
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:bg-white focus:border-slate-900 transition-all"
+                {...register("password")}
+              />
+            </div>
+            {errors.password && <p className="text-[11px] font-bold text-red-500 ml-1">{errors.password.message}</p>}
+          </div>
+        </div>
+
         {mutations.isError && (
-          <span className="font-medium text-sm rounded-md inline-block py-2 px-2 bg-red-400 text-red-800 w-full">
-            {mutations.error.name === "AxiosError"
-              ? "Unstable Network. Try Again"
-              : "Username or password incorrect"}
-          </span>
+          <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
+            <p className="text-xs font-bold text-red-600 text-center">
+              {mutations.error.response?.status === 400 ? "Incorrect email or password" : "Connection failed. Please try again."}
+            </p>
+          </div>
         )}
+
         {mutations.isSuccess && (
-          <span className="font-medium text-sm rounded-md inline-block py-2 px-2 bg-green-400 text-green-800 w-full">
-            Successfully Logged In
-          </span>
+          <div className="p-3 bg-green-50 border border-green-100 rounded-xl">
+            <p className="text-xs font-bold text-green-600 text-center">Login Successful! Redirecting...</p>
+          </div>
         )}
-        <InputContainer label={"Email"} name={"email"} register={register} />
-        <InputContainer
-          label={"Password"}
-          name={"password"}
-          register={register}
-          type="password"
-        />
-      </form>
-      <div className="flex items-center w-full justify-start gap-5">
+
         <button
-          disabled={mutations.isPending}
+          // onClick={(e) => {
+          //   e.preventDefault();
+          //   handleSubmit(onSubmit);
+          // }}
           onClick={handleSubmit(onSubmit)}
-          className="w-fit px-10 bg-green-700 active:scale-95 duration-300 transition-transform  py-2 text-base font-medium rounded-md text-white disabled:cursor-none disabled:bg-[#02EDAF] "
+          // type="submit"
+          disabled={mutations.isPending}
+          className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-slate-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg shadow-slate-900/10"
         >
-          {mutations.isPending ? "...Loading" : "Sign In"}
+          {mutations.isPending ? (
+            <LuLoader className="w-5 h-5 animate-spin" />
+          ) : (
+            "Sign In"
+          )}
         </button>
+      </form>
+
+      <div className="pt-4 border-t border-slate-100 text-center">
+        <p className="text-sm font-medium text-slate-500">
+          Don&apos;t have an account?{" "}
+          <button
+            onClick={gotoSignUp}
+            className="text-slate-900 font-bold hover:underline underline-offset-4 decoration-2 transition-all"
+          >
+            Create account
+          </button>
+        </p>
       </div>
     </div>
   );
